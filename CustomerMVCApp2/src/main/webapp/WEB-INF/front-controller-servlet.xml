@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+  
+	<bean id="dbproperties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:db.properties" />
+	</bean>
+
+	<bean id="dbConfig"
+		class="com.kodeforyou.spring.jdbc.dbconfig.DBConfig">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="dbUrl" value="${jdbc.dbUrlString}" />
+		<property name="dbUser" value="${jdbc.dbUserString}" />
+		<property name="dbPassword" value="${jdbc.dbPasswordString}" />
+	</bean>
+	<bean id="connectionUtil" class="com.kodeforyou.spring.jdbc.dbconfig.ConnectionUtil">
+		<property name="dbConfig" ref="dbConfig"></property>
+	</bean>
+	<bean id="customerDAO"
+		class="com.kodeforyou.spring.jdbc.dao.CustomerDAO">
+		<property name="connectionUtil" ref="connectionUtil"></property>
+	</bean>
+
+	<bean id="customerService"
+		class="com.kodeforyou.spring.jdbc.service.CustomerService">
+		<property name="customerDAO" ref="customerDAO" />
+	</bean>
+
+	<bean name="cc"
+		class="com.kodeforyou.spring.jdbc.controller.CustomerController">
+		<property name="successView" value="success"></property>
+		<property name="errorView" value="error"></property>
+		<property name="customerService" ref="customerService"></property>
+	</bean>
+
+
+	<bean id="hm"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/*.do">cc</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="irvr"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/pages/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+
+
+
+</beans>
